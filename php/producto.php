@@ -1,5 +1,6 @@
 <?php
 date_default_timezone_set("America/Costa_Rica");
+
 $usuario = "root";
 $password = "Solorzano84";
 $servername = "18.217.173.77";
@@ -36,7 +37,15 @@ if($_POST["metodo"] == "select"){
     }
 }else{
     if($_POST["metodo"] == "registrar"){
-        var_dump($_FILES);
+        $target_dir = "../imgs/";
+        $target_file = $target_dir . basename($_FILES["imagen"]["name"]);
+        if ( 0 < $_FILES['imagen']['error'] ) {
+            echo 'Error: ' . $_FILES['imagen']['error'] . '<br>';
+        }
+        else {
+            move_uploaded_file($_FILES['imagen']['tmp_name'], $target_file);
+            echo "Exito";
+        }
         $caracteristicas = array();
         foreach ($_POST as $key => $value){
             if(preg_match('/carac/',$key)){
@@ -55,7 +64,6 @@ if($_POST["metodo"] == "select"){
         .$_FILES['imagen']['name']."', '"
         .$_POST["marca"]."', '"
         .date("d/m/Y")."')";
-        echo $sql;
     }else if($_POST["metodo"] == "editar"){
         $sql = "update Usuarios set 
         nombre='".$_POST["nombre"]."',
@@ -68,13 +76,13 @@ if($_POST["metodo"] == "select"){
         password='".$_POST["password"]."'
          where idUsuarios = ".$_POST["idUsuarios"];
     }
-/*
+
     if($conn->query($sql) === TRUE){
         echo "Exito";
     }else{
         echo "Error";
     }
-    */
+    
 
 }
 
