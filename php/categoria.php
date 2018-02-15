@@ -1,5 +1,4 @@
 <?php
-date_default_timezone_set("America/Costa_Rica");
 $usuario = "root";
 $password = "Solorzano84";
 $servername = "18.217.173.77";
@@ -23,39 +22,29 @@ if($_POST["metodo"] == "select"){
         echo "Error";
     }
 }else if($_POST["metodo"] == "listar"){
-    $sql = "select * from productos";
-    $productos = array();
+    $sql = "select * from categoria";
+    $categorias = array();
     $result = $conn->query($sql);
     if($result->num_rows > 0){
         while($row = mysqli_fetch_assoc($result)){
-            array_push($productos, $row);
+            array_push($categorias, $row);
         }
-        echo json_encode($productos);
+        echo json_encode($categorias);
     }else{
         echo "Error";
     }
 }else{
-    if($_POST["metodo"] == "registrar"){
-        var_dump($_FILES);
-        $caracteristicas = array();
-        foreach ($_POST as $key => $value){
-            if(preg_match('/carac/',$key)){
-                array_push($caracteristicas, $value);
-            }
-        }
-        $caracteristicas = join(';', $caracteristicas);
-        $sql = "insert into productos (nombre,descripcion,modelo,idCategoria,precio,caracteristicas,cantidad,imagen,marca,fechaIngreso) values ('"
+    if($_POST["metodo"] == "registro"){
+        $sql = "insert into Usuarios (nombre,direccion,telefono,correo,
+        pregunta_secreta,respuesta,usuario,password,rol) values ('"
         .$_POST["nombre"]."', '"
-        .$_POST["descripcion"]."', '"
-        .$_POST["modelo"]."', "
-        .$_POST["categoria"].", '"
-        .$_POST["precio"]."', '"
-        .$caracteristicas."', "
-        .$_POST["cantidad"].", '"
-        .$_FILES['imagen']['name']."', '"
-        .$_POST["marca"]."', '"
-        .date("d/m/Y")."')";
-        echo $sql;
+        .$_POST["direccion"]."', '"
+        .$_POST["telefono"]."', '"
+        .$_POST["correo"]."', '"
+        .$_POST["pregunta"]."', '"
+        .$_POST["respuesta"]."', '"
+        .$_POST["usuario"]."', '"
+        .$_POST["password"]."', '1')";
     }else if($_POST["metodo"] == "editar"){
         $sql = "update Usuarios set 
         nombre='".$_POST["nombre"]."',
@@ -68,13 +57,12 @@ if($_POST["metodo"] == "select"){
         password='".$_POST["password"]."'
          where idUsuarios = ".$_POST["idUsuarios"];
     }
-/*
+
     if($conn->query($sql) === TRUE){
         echo "Exito";
     }else{
         echo "Error";
     }
-    */
 
 }
 

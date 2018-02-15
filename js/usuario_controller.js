@@ -12,7 +12,7 @@ function login() {
             console.log(xhr.statusText);
         },
         success: function (usuario_response) {
-            console.log(usuario_response);
+
             if (usuario_response == "Error") {
                 $('#mensaje').text("El usuario digitado no existe");
             } else {

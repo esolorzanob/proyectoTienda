@@ -41,3 +41,7 @@ text-align: center;
 .block{
   cursor: pointer;
 }
+
+.pagination li a{
+  cursor: pointer;
+}
