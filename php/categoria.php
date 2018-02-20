@@ -21,7 +21,7 @@ if($_POST["metodo"] == "select"){
     }else{
         echo "Error";
     }
-}else if($_POST["metodo"] == "listar"){
+}else if($_POST["metodo"] == "listar" || $_GET["metodo"] == "listar"){
     $sql = "select * from categoria";
     $categorias = array();
     $result = $conn->query($sql);

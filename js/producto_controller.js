@@ -66,7 +66,7 @@ function paginacion(numero) {
     $('.pagina' + numero).show()
     window.scrollTo(0, 0)
 }
-function agregar() {
+function agregarCarrito() {
     if (sessionStorage.getItem('carrito')) {
         var carrito = JSON.parse(sessionStorage.getItem('carrito'));
     } else {
@@ -149,7 +149,7 @@ function listarProductos() {
                 var marca = document.createElement('td');
                 $(marca).text(e.marca);
                 $(tr).append(marca);
-                $('<td class="center"><a href="editarProdcuto.html?' + e.idproductos + '"><i class="far fa-edit fa-lg verde"></i></a></td>').appendTo(tr);
+                $('<td class="center"><a href="editarProducto.html?' + e.idproductos + '"><i class="far fa-edit fa-lg verde"></i></a></td>').appendTo(tr);
                 $('<td class="center"><a href="agregarOferta.html?' + e.idproductos + '"><i class="fas fa-tags fa-lg azul"></i></a></td>').appendTo(tr);
                 $('<td class="center"><a class="block" onclick="borrarProducto(' + e.idproductos + ')"><i class="fas fa-trash fa-lg rojo"></i></a></td>').appendTo(tr);
                 $('#listaProductos').append(tr);
@@ -157,3 +157,63 @@ function listarProductos() {
         }
     });
 }
+
+function logout() {
+    sessionStorage.removeItem('usuarioLogueado');
+    window.location.href = 'index.html';
+}
+function traerProductoEditar(id) {
+    var producto = {
+        id: id,
+        metodo: "traerProducto"
+    }
+    $.ajax({
+        url: "../php/producto.php",
+        method: "POST",
+        data: producto,
+        error: function (xhr) {
+            console.log(xhr.statusText)
+        },
+        success: function (producto_response) {
+            const traerCategorias = async () => {
+                const res = await fetch('../php/categoria.php?metodo=listar')
+                const json = await res.json();
+                json.map(function (e) {
+                    $('<option value="' + e.idcategoria + '">' + e.nombre + '</option>').appendTo('#categoria');
+                })
+                $('select[name="categoria"]').val(producto.idCategoria);
+            }
+            traerCategorias();
+            var producto = JSON.parse(producto_response);
+            $('input[name="nombre"]').val(producto.nombre);
+            $('input[name="descripcion"]').val(producto.descripcion);
+            $('input[name="modelo"]').val(producto.modelo);
+            $('input[name="marca"]').val(producto.marca);
+            $('input[name="precio"]').val(producto.precio);
+            $('input[name="cantidad"]').val(producto.cantidad);
+            $('input[name="idproductos"]').val(producto.idproductos);
+            var caracteristicas = producto.caracteristicas.split(';');
+            $('input[name="carac1"]').val(caracteristicas[0]);
+            if (caracteristicas.length > 1) {
+                for (var i = 1; i < caracteristicas.length; i++) {
+                    $('<div class="controls" ><input class="caracteristica" name="carac' + (i + 1) + '" type="text" value="' + caracteristicas[i] + '"><label id="quitar" onclick="quitar(this)"> <i class="fas fa-minus-square fa-lg"></i></label></div>').appendTo('#caracteristicas');
+                }
+            }
+        }
+    })
+}
+$("form#editarProducto").submit(function (e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    $.ajax({
+        url: "../php/producto.php",
+        type: 'POST',
+        data: formData,
+        success: function (data) {
+            alert(data)
+        },
+        cache: false,
+        contentType: false,
+        processData: false
+    });
+});

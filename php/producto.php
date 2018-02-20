@@ -65,16 +65,46 @@ if($_POST["metodo"] == "select"){
         .$_POST["marca"]."', '"
         .date("d/m/Y")."')";
     }else if($_POST["metodo"] == "editar"){
-        $sql = "update Usuarios set 
-        nombre='".$_POST["nombre"]."',
-        direccion='".$_POST["direccion"]."',
-        telefono='".$_POST["telefono"]."',
-        correo='".$_POST["correo"]."',
-        pregunta_secreta='".$_POST["pregunta_secreta"]."',
-        respuesta='".$_POST["respuesta"]."',
-        usuario='".$_POST["usuario"]."',
-        password='".$_POST["password"]."'
-         where idUsuarios = ".$_POST["idUsuarios"];
+        $caracteristicas = array();
+        foreach ($_POST as $key => $value){
+            if(preg_match('/carac/',$key)){
+                array_push($caracteristicas, $value);
+            }
+        }
+        $caracteristicas = join(';', $caracteristicas);
+        if(is_uploaded_file($_FILES['imagen']['tmp_name'])){
+            $target_dir = "../imgs/";
+            $target_file = $target_dir . basename($_FILES["imagen"]["name"]);
+            if ( 0 < $_FILES['imagen']['error'] ) {
+               echo 'Error: ' . $_FILES['imagen']['error'] . '<br>';
+            }
+            else {
+              move_uploaded_file($_FILES['imagen']['tmp_name'], $target_file);
+              echo "Exito";
+            }
+            $sql = "update productos set 
+            nombre='".$_POST["nombre"]."',
+            descripcion='".$_POST["descripcion"]."',
+            modelo='".$_POST["modelo"]."',
+            idCategoria=".$_POST["categoria"].",
+            precio='".$_POST["precio"]."',
+            caracteristicas='".$caracteristicas."',
+            cantidad=".$_POST["cantidad"].",
+            marca='".$_POST["marca"]."',
+            imagen='".$_FILES['imagen']['name']."'
+            where idproductos = ".$_POST["idproductos"];
+        }else{
+            $sql = "update productos set 
+            nombre='".$_POST["nombre"]."',
+            descripcion='".$_POST["descripcion"]."',
+            modelo='".$_POST["modelo"]."',
+            idCategoria=".$_POST["categoria"].",
+            precio='".$_POST["precio"]."',
+            caracteristicas='".$caracteristicas."',
+            cantidad=".$_POST["cantidad"].",
+            marca='".$_POST["marca"]."'
+            where idproductos = ".$_POST["idproductos"];
+        } 
     }
 
     if($conn->query($sql) === TRUE){
