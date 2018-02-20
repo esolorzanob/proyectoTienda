@@ -45,3 +45,11 @@ text-align: center;
 .pagination li a{
   cursor: pointer;
 }
+
+.center{
+  text-align: center;
+}
+
+.azul{
+  color: blue;
+}

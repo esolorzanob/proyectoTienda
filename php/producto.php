@@ -3,7 +3,7 @@ date_default_timezone_set("America/Costa_Rica");
 
 $usuario = "root";
 $password = "Solorzano84";
-$servername = "18.217.173.77";
+$servername = "18.219.254.158";
 $dbname = "proyecto_lunes_noche";
 $conn = new mysqli($servername, $usuario, $password, $dbname);
 mysqli_set_charset($conn,"utf8");

@@ -103,7 +103,7 @@ function traerCategorias() {
         }
     })
 }
-
+//registrar Producto
 $("form#producto").submit(function (e) {
     e.preventDefault();
     var formData = new FormData(this);
@@ -119,3 +119,41 @@ $("form#producto").submit(function (e) {
         processData: false
     });
 });
+function listarProductos() {
+    var producto = {
+        metodo: "listar"
+    }
+    $.ajax({
+        url: "../php/producto.php",
+        method: "POST",
+        data: producto,
+        error: function (xhr) {
+            console.log(xhr.statusText);
+        },
+        success: function (producto_response) {
+            var productos = JSON.parse(producto_response);
+            productos.map(function (e) {
+                var tr = document.createElement('tr');
+                var nombre = document.createElement('td');
+                $(nombre).text(e.nombre);
+                $(tr).append(nombre);
+                var descripcion = document.createElement('td');
+                $(descripcion).text(e.descripcion);
+                $(tr).append(descripcion);
+                var modelo = document.createElement('td');
+                $(modelo).text(e.modelo);
+                $(tr).append(modelo);
+                var precio = document.createElement('td');
+                $(precio).text(e.precio);
+                $(tr).append(precio);
+                var marca = document.createElement('td');
+                $(marca).text(e.marca);
+                $(tr).append(marca);
+                $('<td class="center"><a href="editarProdcuto.html?' + e.idproductos + '"><i class="far fa-edit fa-lg verde"></i></a></td>').appendTo(tr);
+                $('<td class="center"><a href="agregarOferta.html?' + e.idproductos + '"><i class="fas fa-tags fa-lg azul"></i></a></td>').appendTo(tr);
+                $('<td class="center"><a class="block" onclick="borrarProducto(' + e.idproductos + ')"><i class="fas fa-trash fa-lg rojo"></i></a></td>').appendTo(tr);
+                $('#listaProductos').append(tr);
+            })
+        }
+    });
+}
