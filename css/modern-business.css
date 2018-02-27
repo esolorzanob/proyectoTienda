@@ -56,3 +56,15 @@ text-align: center;
 .caracteristica{
   width: 95%;
 }
+
+.precioSinOferta{
+  text-decoration: line-through;
+}
+.precioConOferta{
+  color: red;
+  font-size: 1.6em;
+}
+
+.amarillo{
+  color: yellow;
+}

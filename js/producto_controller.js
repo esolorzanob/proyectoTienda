@@ -15,7 +15,19 @@ function catalogo() {
             var contador = 0
             var numPagina = 1
             productos.map(function (producto) {
-                $('<div class="col-lg-4 col-sm-6 portfolio-item pagina' + numPagina + '"><div class="card h-100"><a href="producto.html?' + producto.idproductos + '"><img class="card-img-top" src="imgs/' + producto.imagen + '" alt=""></a><div class="card-body"><h4 class="card-title"><a href="producto.html?' + producto.idproductos + '" class="nombre">' + producto.nombre + '</a></h4><p class="card-text" class="descripcion">' + producto.descripcion + '</p><p class="card-text" class="precio">Precio: ' + producto.precio + ' colones</p></div></div></div>').appendTo('#catalogoContainer')
+                $('<div id="' + producto.idproductos + '" class="col-lg-4 col-sm-6 portfolio-item pagina' + numPagina + '"><div class="card h-100"><a href="producto.html?' + producto.idproductos + '"><img class="card-img-top" src="imgs/' + producto.imagen + '" alt=""></a><div class="card-body"><h4 class="card-title"><a href="producto.html?' + producto.idproductos + '" class="nombre">' + producto.nombre + '</a></h4><p class="card-text" class="descripcion">' + producto.descripcion + '</p><p class="card-text precio">Precio: ' + producto.precio + ' colones</p></div></div></div>').appendTo('#catalogoContainer')
+                if (producto.precioOferta) {
+                    var inicio = producto.fechaInicioOferta.replace(/\-/g, ',');
+                    inicio = new Date(inicio);
+                    var fin = producto.fechaFinOferta.replace(/\-/g, ',');
+                    fin = new Date(fin);
+                    var hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    if (inicio <= hoy && fin >= hoy) {
+                        $('#' + producto.idproductos).find('.precio').addClass('precioSinOferta');
+                        $('<p class="precioConOferta">Oferta: ' + producto.precioOferta + '</p>').appendTo('#' + producto.idproductos + ' .card-body');
+                    }
+                }
                 contador++
                 if (contador == 6) {
                     contador = 0
@@ -58,6 +70,18 @@ function traerProducto(id) {
                 if (caracteristica.trim())
                     $('<li>' + caracteristica + '</li>').appendTo('#caracteristicas')
             })
+            if (producto.precioOferta) {
+                var inicio = producto.fechaInicioOferta.replace(/\-/g, ',');
+                inicio = new Date(inicio);
+                var fin = producto.fechaFinOferta.replace(/\-/g, ',');
+                fin = new Date(fin);
+                var hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                if (inicio <= hoy && fin >= hoy) {
+                    $('#precio').addClass('precioSinOferta');
+                    $('<h3 id="oferta" class="precioConOferta">Oferta: ' + producto.precioOferta + '</h3>').insertAfter('#precio')
+                }
+            }
         }
     })
 }
@@ -74,10 +98,15 @@ function agregarCarrito() {
     }
     var productoActual = JSON.parse(sessionStorage.getItem('productoActual'))
     var producto = {
+        id: productoActual.idproductos,
         nombre: productoActual.nombre,
         marca: productoActual.marca,
         imagen: productoActual.imagen,
-        precio: productoActual.precio
+    }
+    if ($('#oferta').text()) {
+        producto.precio = productoActual.precioOferta;
+    } else {
+        producto.precio = productoActual.precio;
     }
     carrito.push(producto);
     sessionStorage.setItem('carrito', JSON.stringify(carrito));
@@ -231,9 +260,9 @@ function traerProductoOferta(id) {
         },
         success: function (producto_response) {
             var productoActual = JSON.parse(producto_response);
-            $('#nombre').text(productoActual.nombre);
-            $('#modelo').text(productoActual.modelo);
-            $('#marca').text(productoActual.marca);
+            $('#nombre').append(productoActual.nombre);
+            $('#modelo').append(productoActual.modelo);
+            $('#marca').append(productoActual.marca);
             $('#id').val(productoActual.idproductos);
             $('#precio').append(productoActual.precio);
         }
@@ -260,4 +289,45 @@ function agregarOferta() {
         }
     })
     return false;
+}
+function traerProductosPrincipal() {
+    var producto = {
+        metodo: "listar"
+    }
+    $.ajax({
+        url: "../php/producto.php",
+        method: "POST",
+        data: producto,
+        error: function (xhr) {
+            console.log(xhr.statusText);
+        },
+        success: function (producto_response) {
+            var productos = JSON.parse(producto_response);
+            var i = 0;
+            productos.map(function (producto) {
+                if (producto.precioOferta) {
+                    var inicio = producto.fechaInicioOferta.replace(/\-/g, ',');
+                    inicio = new Date(inicio);
+                    var fin = producto.fechaFinOferta.replace(/\-/g, ',');
+                    fin = new Date(fin);
+                    var hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    if (inicio <= hoy && fin >= hoy) {
+                        $(`<div id="` + producto.idproductos + `" class="carousel-item" style="background-image: url('imgs/` + producto.imagen + `')">
+                            <div class="carousel-caption d-none d-md-block">
+                               <a href="producto.html?`+ producto.idproductos + `"> <h3 class="amarillo">` + producto.nombre + `</h3></a>
+                                <p class="amarillo">`+ producto.descripcion + `</p>
+                                <p class="amarillo">Oferta: `+ producto.precioOferta + `</p>
+                            </div>
+                        </div>`).appendTo('#carouselExampleIndicators .carousel-inner');
+                        if (i == 0) {
+                            $('#' + producto.idproductos).addClass('active');
+                        }
+                        $('<li data-target="#carouselExampleIndicators" data-slide-to="' + i + '" ></li>').appendTo('#carouselExampleIndicators .carousel-indicators');
+                        i++;
+                    }
+                }
+            })
+        }
+    });
 }

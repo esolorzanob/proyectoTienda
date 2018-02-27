@@ -16,3 +16,4 @@ if (usuarioGuardado) {
     $('<a class="dropdown-item" href="javascript:void(0);" onclick="logout()">Logout</a>').appendTo(div);
     $('#login').parent().append(div);
 }
+traerProductosPrincipal();
