@@ -105,6 +105,12 @@ if($_POST["metodo"] == "select"){
             marca='".$_POST["marca"]."'
             where idproductos = ".$_POST["idproductos"];
         } 
+    }else if($_POST["metodo"] == "agregarOferta"){
+        $sql = "update productos set
+        precioOferta='".$_POST["precioOferta"]."',
+        fechaInicioOferta='".$_POST["fechaInicioOferta"]."',
+        fechaFinOferta='".$_POST["fechaFinOferta"]."'
+        where idproductos=".$_POST["id"];
     }
 
     if($conn->query($sql) === TRUE){

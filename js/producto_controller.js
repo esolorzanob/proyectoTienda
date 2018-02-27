@@ -217,3 +217,47 @@ $("form#editarProducto").submit(function (e) {
         processData: false
     });
 });
+function traerProductoOferta(id) {
+    var producto = {
+        id: id,
+        metodo: "traerProducto"
+    }
+    $.ajax({
+        url: "../php/producto.php",
+        method: "POST",
+        data: producto,
+        error: function (xhr) {
+            console.log(xhr.statusText)
+        },
+        success: function (producto_response) {
+            var productoActual = JSON.parse(producto_response);
+            $('#nombre').text(productoActual.nombre);
+            $('#modelo').text(productoActual.modelo);
+            $('#marca').text(productoActual.marca);
+            $('#id').val(productoActual.idproductos);
+            $('#precio').append(productoActual.precio);
+        }
+    })
+}
+
+function agregarOferta() {
+    var producto = {
+        fechaInicioOferta: $('#fechaInicioOferta').val(),
+        fechaFinOferta: $('#fechaFinOferta').val(),
+        precioOferta: $('#precioOferta').val(),
+        id: $('#id').val(),
+        metodo: "agregarOferta"
+    }
+    $.ajax({
+        url: "../php/producto.php",
+        method: "POST",
+        data: producto,
+        error: function (xhr) {
+            console.log(xhr.statusText)
+        },
+        success: function (producto_response) {
+            alert(producto_response)
+        }
+    })
+    return false;
+}
