@@ -68,3 +68,24 @@ text-align: center;
 .amarillo{
   color: yellow;
 }
+
+.producto {
+  border-bottom: 1px solid lightblue;
+  margin-bottom: 2%;
+  padding-bottom: 2%;
+}
+
+.producto input{
+  width: 40px;
+}
+
+#totalContainer{
+  justify-content: flex-end;
+   display: flex;
+   margin-bottom: 3%;
+}
+
+#totalContainer label {
+  font-size: 2em;
+  margin-right: 30px;
+}

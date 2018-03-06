@@ -97,18 +97,7 @@ function agregarCarrito() {
         var carrito = [];
     }
     var productoActual = JSON.parse(sessionStorage.getItem('productoActual'))
-    var producto = {
-        id: productoActual.idproductos,
-        nombre: productoActual.nombre,
-        marca: productoActual.marca,
-        imagen: productoActual.imagen,
-    }
-    if ($('#oferta').text()) {
-        producto.precio = productoActual.precioOferta;
-    } else {
-        producto.precio = productoActual.precio;
-    }
-    carrito.push(producto);
+    carrito.push(productoActual);
     sessionStorage.setItem('carrito', JSON.stringify(carrito));
     alert("El producto se agregó a su carro de compras")
 }
@@ -330,4 +319,71 @@ function traerProductosPrincipal() {
             })
         }
     });
+}
+function construirCarrito() {
+    var productos = JSON.parse(sessionStorage.getItem('carrito'));
+    productos.map(function (producto) {
+        $(`<div class="row producto" id="` + producto.idproductos + `">
+        <div class="col-lg-2">
+          <img class="img-fluid rounded mb-4" src="imgs/`+ producto.imagen + `">
+        </div>
+        <div class="col-lg-10">
+          <p class="nombre">`+ producto.nombre + `</p>
+          <p class="descripcion">`+ producto.descripcion + `</p>
+          <p class="marca"><b>Marca:</b> `+ producto.marca + `</p>
+          <p class="modelo"><b>Modelo:</b> `+ producto.modelo + `</p>
+          <p class="precio">Precio: </p>
+          <label>Cantidad: </label>
+          <input type="number" value="1" onchange="calcularTotal()">
+        </div>
+      </div>`).appendTo('#productosContainer');
+        if (producto.precioOferta) {
+            var inicio = producto.fechaInicioOferta.replace(/\-/g, ',');
+            inicio = new Date(inicio);
+            var fin = producto.fechaFinOferta.replace(/\-/g, ',');
+            fin = new Date(fin);
+            var hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            if (inicio <= hoy && fin >= hoy) {
+                $('#' + producto.idproductos).find('.precio').append(producto.precioOferta);
+            } else {
+                $('#' + producto.idproductos).find('.precio').append(producto.precio);
+            }
+        } else {
+            $('#' + producto.idproductos).find('.precio').append(producto.precio);
+        }
+        calcularTotal();
+    })
+}
+
+function calcularTotal() {
+    var total = 0;
+    $('.producto').each(function () {
+        var cantidad = parseInt($(this).find('input').val());
+        total += parseInt($(this).find('.precio').text().replace(/[^\d]/g, '')) * cantidad;
+    })
+    $('#totalContainer label span').text(total);
+}
+function procesarPedido() {
+    var pedido = {};
+    pedido.idUsuarios = JSON.parse(sessionStorage.getItem('usuarioLogueado')).idUsuarios;
+    pedido.fecha = new Date();
+    pedido.total = $('#totalContainer label span').text();
+    pedido.estado = "Pendiente";
+    var productoIds = [];
+    $('.producto').each(function () {
+        productoIds.push($(this).attr('id'));
+    });
+    pedido.productoIds = productoIds;
+    $.ajax({
+        url: "../php/pedido.php",
+        method: "POST",
+        data: pedido,
+        error: function (xhr) {
+            console.log(xhr.statusText)
+        },
+        success: function (pedido_response) {
+            alert(pedido_response);
+        }
+    })
 }
